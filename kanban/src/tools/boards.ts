@@ -10,6 +10,7 @@ type BoardsParams = {
   slug?: string;
   visibility?: "public" | "private";
   favorite?: boolean;
+  lists?: string[];
 };
 
 export async function boardsHandler(client: KanClient, params: BoardsParams): Promise<unknown> {
@@ -20,10 +21,16 @@ export async function boardsHandler(client: KanClient, params: BoardsParams): Pr
     case "get":
       if (!params.boardPublicId) throw new Error("boardPublicId required for get");
       return client.get(`/boards/${params.boardPublicId}`);
-    case "create":
+    case "create": {
       if (!params.workspacePublicId) throw new Error("workspacePublicId required for create");
       if (!params.name) throw new Error("name required for create");
-      return client.post(`/workspaces/${params.workspacePublicId}/boards`, { name: params.name });
+      const listNames = params.lists ?? ["do", "doing", "done"];
+      return client.post(`/workspaces/${params.workspacePublicId}/boards`, {
+        name: params.name,
+        lists: listNames,
+        labels: [],
+      });
+    }
     case "update":
       if (!params.boardPublicId) throw new Error("boardPublicId required for update");
       return client.put(`/boards/${params.boardPublicId}`, {
@@ -47,6 +54,7 @@ export function registerBoardsTool(server: McpServer, client: KanClient): void {
       workspacePublicId: z.string().optional().describe("Workspace ID (required for list, create)"),
       boardPublicId: z.string().optional().describe("Board ID (required for get, update, delete)"),
       name: z.string().min(1).max(100).optional().describe("Board name (required for create)"),
+      lists: z.array(z.string().min(1)).optional().describe("List names for new board (default: [\"do\", \"doing\", \"done\"])"),
       slug: z.string().optional().describe("Board slug (for update)"),
       visibility: z.enum(["public", "private"]).optional().describe("Board visibility (for update)"),
       favorite: z.boolean().optional().describe("Favorite status (for update)"),

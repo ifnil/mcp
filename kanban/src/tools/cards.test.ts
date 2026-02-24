@@ -19,13 +19,17 @@ describe("cardsHandler", () => {
     expect(client.get).toHaveBeenCalledWith("/cards/card_1");
   });
 
-  it("create — calls POST /cards with title and listPublicId", async () => {
+  it("create — sends defaults for description, position, labelPublicIds, memberPublicIds", async () => {
     const client = makeClient();
     await cardsHandler(client, { action: "create", listPublicId: "lst_1", title: "Fix bug" });
-    expect(client.post).toHaveBeenCalledWith("/cards", expect.objectContaining({
+    expect(client.post).toHaveBeenCalledWith("/cards", {
       title: "Fix bug",
       listPublicId: "lst_1",
-    }));
+      description: "",
+      position: "end",
+      labelPublicIds: [],
+      memberPublicIds: [],
+    });
   });
 
   it("create — includes all optional fields when provided", async () => {
@@ -43,6 +47,8 @@ describe("cardsHandler", () => {
       listPublicId: "lst_1",
       description: "Details here",
       position: "start",
+      labelPublicIds: [],
+      memberPublicIds: [],
       dueDate: "2026-03-01",
     });
   });

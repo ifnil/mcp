@@ -30,10 +30,29 @@ describe("boardsHandler", () => {
     expect(client.get).toHaveBeenCalledWith("/boards/bd_1");
   });
 
-  it("create — calls POST /workspaces/:id/boards", async () => {
+  it("create — sends default lists and empty labels", async () => {
     const client = makeClient();
     await boardsHandler(client, { action: "create", workspacePublicId: "ws_1", name: "Backlog" });
-    expect(client.post).toHaveBeenCalledWith("/workspaces/ws_1/boards", { name: "Backlog" });
+    expect(client.post).toHaveBeenCalledWith("/workspaces/ws_1/boards", {
+      name: "Backlog",
+      lists: ["do", "doing", "done"],
+      labels: [],
+    });
+  });
+
+  it("create — forwards custom list names", async () => {
+    const client = makeClient();
+    await boardsHandler(client, {
+      action: "create",
+      workspacePublicId: "ws_1",
+      name: "Life",
+      lists: ["backlog", "do", "doing", "done"],
+    });
+    expect(client.post).toHaveBeenCalledWith("/workspaces/ws_1/boards", {
+      name: "Life",
+      lists: ["backlog", "do", "doing", "done"],
+      labels: [],
+    });
   });
 
   it("update — calls PUT /boards/:id", async () => {

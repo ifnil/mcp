@@ -24,8 +24,10 @@ export async function cardsHandler(client: KanClient, params: CardsParams): Prom
       return client.post("/cards", {
         title: params.title,
         listPublicId: params.listPublicId,
-        ...(params.description !== undefined ? { description: params.description } : {}),
-        ...(params.position !== undefined ? { position: params.position } : {}),
+        description: params.description ?? "",
+        position: params.position ?? "end",
+        labelPublicIds: [],
+        memberPublicIds: [],
         ...(params.dueDate !== undefined ? { dueDate: params.dueDate } : {}),
       });
     case "update":
