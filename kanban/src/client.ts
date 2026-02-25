@@ -1,4 +1,4 @@
-const BASE_URL = "https://board.local.gum.zone/api/v1";
+const BASE_URL = "https://board.gum.zone/api/v1";
 let requestCounter = 0;
 
 function debugEnabledFromEnv(): boolean {
